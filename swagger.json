@@ -1,0 +1,205 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Slim Mom API",
+    "version": "1.0.0",
+    "description": "Documentație pentru toate endpoint-urile aplicației Slim Mom."
+  },
+  "servers": [
+    { "url": "http://localhost:5000" }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Înregistrare utilizator",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User registered" },
+          "409": { "description": "Email already in use" }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Autentificare utilizator",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/products/public/daily": {
+      "post": {
+        "summary": "Aport caloric și produse nerecomandate (public)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "age": { "type": "number" },
+                  "height": { "type": "number" },
+                  "weight": { "type": "number" },
+                  "desiredWeight": { "type": "number" },
+                  "bloodType": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Daily info returned" }
+        }
+      }
+    },
+    "/api/products/private/daily": {
+      "post": {
+        "summary": "Aport caloric și produse nerecomandate (privat)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "age": { "type": "number" },
+                  "height": { "type": "number" },
+                  "weight": { "type": "number" },
+                  "desiredWeight": { "type": "number" },
+                  "bloodType": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Daily info saved and returned" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/products/search": {
+      "get": {
+        "summary": "Căutare produse după query",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Products found" }
+        }
+      }
+    },
+    "/api/diary/add": {
+      "post": {
+        "summary": "Adaugă produs la jurnal (privat)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": { "type": "string" },
+                  "productId": { "type": "string" },
+                  "weight": { "type": "number" },
+                  "calories": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Product added to diary" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/diary/delete": {
+      "post": {
+        "summary": "Șterge produs din jurnal (privat)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": { "type": "string" },
+                  "productId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Product removed from diary" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/diary/{date}": {
+      "get": {
+        "summary": "Primește toate informațiile despre o zi (privat)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Diary entry for the day" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
