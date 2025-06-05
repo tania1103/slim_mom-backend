@@ -1,13 +1,19 @@
 const express = require('express');
-const router = express.Router();
-const diaryController = require('../controllers/diaryController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { addToDiary, getDiaryByDate, deleteDiaryEntry, getAllDiaryEntries } = require('../controllers/diaryController');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
-// Adaugă produs la jurnal (privat)
-router.post('/add', authMiddleware, diaryController.addProductToDiary);
-// Șterge produs din jurnal (privat)
-router.post('/delete', authMiddleware, diaryController.removeProductFromDiary);
-// Primește toate informațiile despre o zi (privat)
-router.get('/:date', authMiddleware, diaryController.getDiaryByDate);
+const router = express.Router();
+
+// Route for adding product to diary
+router.post('/add', authMiddleware, addToDiary);
+
+// Route for getting diary entries by date
+router.get('/:date', authMiddleware, getDiaryByDate);
+
+// Route for getting all diary entries
+router.get('/', authMiddleware, getAllDiaryEntries);
+
+// Route for deleting diary entry
+router.delete('/:entryId', authMiddleware, deleteDiaryEntry);
 
 module.exports = router;

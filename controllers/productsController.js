@@ -11,27 +11,77 @@ exports.createProduct = async (req, res) => {
     }
 };
 
+// Search products by name
+exports.searchProducts = async (req, res) => {
+  try {
+    const { search } = req.query;
+    
+    if (!search) {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+
+    const products = await Product.find({
+      title: { $regex: search, $options: 'i' }
+    }).limit(20);
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Search products error:', error);
+    res.status(500).json({ message: 'Error searching products', error: error.message });
+  }
+};
+
+// Get products by blood type
+exports.getProductsByBloodType = async (req, res) => {
+  try {
+    const { bloodType } = req.params;
+    
+    // Simulate forbidden products for blood type (this would normally come from a database)
+    const forbiddenProducts = {
+      1: ['sugar', 'chocolate', 'cake'],
+      2: ['meat', 'dairy', 'wheat'],
+      3: ['chicken', 'corn', 'buckwheat'],
+      4: ['red meat', 'seeds', 'nuts']
+    };
+
+    const forbidden = forbiddenProducts[bloodType] || [];
+    
+    res.status(200).json({
+      bloodType: parseInt(bloodType),
+      notAllowedProducts: forbidden
+    });
+  } catch (error) {
+    console.error('Get products by blood type error:', error);
+    res.status(500).json({ message: 'Error fetching products by blood type', error: error.message });
+  }
+};
+
 // Get all products
 exports.getAllProducts = async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.status(200).json(products);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const products = await Product.find().limit(100);
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Get all products error:', error);
+    res.status(500).json({ message: 'Error fetching products', error: error.message });
+  }
 };
 
 // Get a product by ID
 exports.getProductById = async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
-        res.status(200).json(product);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
     }
+
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Get product by ID error:', error);
+    res.status(500).json({ message: 'Error fetching product', error: error.message });
+  }
 };
 
 // Update a product by ID
@@ -86,16 +136,5 @@ exports.getDailyInfoPrivate = async (req, res) => {
     res.json({ dailyCalories, notAllowedProducts });
   } catch (err) {
     res.status(500).json({ message: 'Failed to save daily info', error: err.message });
-  }
-};
-
-// Căutare produse după query
-exports.searchProducts = async (req, res) => {
-  try {
-    const { query } = req.query;
-    const products = await Product.find({ title: { $regex: query, $options: 'i' } });
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ message: 'Product search failed', error: err.message });
   }
 };

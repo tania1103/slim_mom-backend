@@ -1,13 +1,19 @@
 const express = require('express');
-const router = express.Router();
-const productsController = require('../controllers/productsController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { searchProducts, getProductsByBloodType, getAllProducts, getProductById } = require('../controllers/productsController');
+const { authMiddleware } = require('../middleware/authMiddleware');
 
-// Endpoint public
-router.post('/public/daily', productsController.getDailyInfoPublic);
-// Endpoint privat
-router.post('/private/daily', authMiddleware, productsController.getDailyInfoPrivate);
-// Căutare produse
-router.get('/search', productsController.searchProducts);
+const router = express.Router();
+
+// Route for searching products
+router.get('/search', authMiddleware, searchProducts);
+
+// Route for getting products by blood type
+router.get('/blood-type/:bloodType', authMiddleware, getProductsByBloodType);
+
+// Route for getting all products
+router.get('/', authMiddleware, getAllProducts);
+
+// Route for getting product by ID
+router.get('/:id', authMiddleware, getProductById);
 
 module.exports = router;
