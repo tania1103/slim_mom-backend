@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const productsRoutes = require('./routes/productsRoutes');
 const diaryRoutes = require('./routes/diaryRoutes');
 const swaggerUi = require('swagger-ui-express');
@@ -12,7 +13,20 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow localhost and production origins
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'https://tania1103.github.io',
+    'https://slimmom-frontend.netlify.app',
+    'https://slimmom-frontend.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI, {
@@ -28,6 +42,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', userRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/diary', diaryRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
