@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # SlimMom API Service
+  slimmom-api:
+    build: .
+    container_name: slimmom-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.production
+    volumes:
+      - ./logs:/app/logs
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - slimmom-network
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MongoDB Service (pentru development local)
+  mongodb:
+    image: mongo:6.0
+    container_name: slimmom-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: slimmom
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - slimmom-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: slimmom-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - slimmom-api
+    networks:
+      - slimmom-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  slimmom-network:
+    driver: bridge
