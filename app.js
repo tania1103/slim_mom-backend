@@ -57,6 +57,8 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
       'https://tania1103.github.io',
       'https://slimmom-frontend.netlify.app',
       'https://slimmom-frontend.vercel.app'
@@ -80,6 +82,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Handle preflight OPTIONS requests
+app.options('*', cors(corsOptions));
+
 // MongoDB connection for Mongoose 8.x
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
@@ -99,15 +104,28 @@ app.get('/health/detailed', detailedHealthHandler);
 
 // Main health check route
 app.get('/', (req, res) => {
-  res.json({ 
+  const uptime = process.uptime();
+  const response = { 
     message: 'SlimMom API is running!',
     version: '2.0.0',
     security: 'HIGH',
     mongoose: mongoose.version,
     status: 'healthy',
+    uptime: `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${Math.floor(uptime % 60)}s`,
+    timestamp: new Date().toISOString(),
     documentation: '/api-docs',
-    health: '/health'
-  });
+    health: '/health',
+    endpoints: {
+      auth: '/api/auth',
+      products: '/api/products', 
+      diary: '/api/diary',
+      profile: '/api/profile',
+      calories: '/api/calories'
+    }
+  };
+  
+  console.log(`🏠 Root endpoint accessed - Server awake and running`);
+  res.json(response);
 });
 
 // API Routes
@@ -117,8 +135,32 @@ app.use('/api/products', productsRoutes);
 app.use('/api/diary', diaryRoutes);
 app.use('/api/calories', calorieRoutes);
 
+// Fallback for any /api/* routes that weren't matched
+app.use('/api/*', (req, res) => {
+  console.log(`⚠️  Unmatched API route: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    message: 'API endpoint not found',
+    path: req.originalUrl,
+    method: req.method,
+    availableEndpoints: [
+      '/api/auth/register',
+      '/api/auth/login', 
+      '/api/products/search',
+      '/api/products/blood-type/:bloodType',
+      '/api/diary',
+      '/api/profile',
+      '/api/calories'
+    ]
+  });
+});
+
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Handle favicon.ico requests to avoid 404 warnings
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // No content, but no error
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -140,10 +182,22 @@ app.use((err, req, res, next) => {
 
 // 404 Handler
 app.use('*', (req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ 
     message: 'Route not found',
     path: req.originalUrl,
-    method: req.method
+    method: req.method,
+    availableRoutes: [
+      'GET /',
+      'GET /health',
+      'GET /api-docs',
+      'POST /api/auth/register',
+      'POST /api/auth/login',
+      'GET /api/products',
+      'GET /api/diary',
+      'GET /api/profile'
+    ],
+    suggestion: 'Check the API documentation at /api-docs'
   });
 });
 

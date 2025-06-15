@@ -1,0 +1,72 @@
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/favicon.ico',
+  status: 404,
+  duration: '4ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+  timestamp: '2025-06-14 15:00:06',
+  level: 'warn',
+  message: 'HTTP Error'
+}
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/favicon.ico',
+  status: 404,
+  duration: '7ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+  timestamp: '2025-06-15 16:53:43',
+  level: 'warn',
+  message: 'HTTP Error'
+}
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/api/products',
+  status: 401,
+  duration: '8ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ro-RO) WindowsPowerShell/5.1.26100.4202',
+  timestamp: '2025-06-15 16:58:54',
+  level: 'warn',
+  message: 'HTTP Error'
+}
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/api/products',
+  status: 401,
+  duration: '2ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ro-RO) WindowsPowerShell/5.1.26100.4202',
+  timestamp: '2025-06-15 16:59:55',
+  level: 'warn',
+  message: 'HTTP Error'
+}
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/api/products/search/public?q=banana',
+  status: 400,
+  duration: '2ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT; Windows NT 10.0; ro-RO) WindowsPowerShell/5.1.26100.4202',
+  timestamp: '2025-06-15 17:03:19',
+  level: 'warn',
+  message: 'HTTP Error'
+}
+{
+  service: 'slimmom-api',
+  method: 'GET',
+  url: '/api/products/search/public?q=banana',
+  status: 400,
+  duration: '2ms',
+  ip: '::1',
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+  timestamp: '2025-06-15 17:03:42',
+  level: 'warn',
+  message: 'HTTP Error'
+}

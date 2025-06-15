@@ -14,14 +14,20 @@ exports.createProduct = async (req, res) => {
 // Search products by name
 exports.searchProducts = async (req, res) => {
   try {
-    const { search } = req.query;
+    // Accept both 'q' and 'search' parameters for flexibility
+    const { q, search } = req.query;
+    const searchQuery = q || search;
     
-    if (!search) {
-      return res.status(400).json({ message: 'Search query is required' });
+    if (!searchQuery) {
+      return res.status(400).json({ message: 'Search query is required (use ?q=searchterm)' });
     }
 
     const products = await Product.find({
-      title: { $regex: search, $options: 'i' }
+      $or: [
+        { 'title.ua': { $regex: searchQuery, $options: 'i' } },
+        { 'title.en': { $regex: searchQuery, $options: 'i' } },
+        { 'title.ru': { $regex: searchQuery, $options: 'i' } }
+      ]
     }).limit(20);
 
     res.status(200).json(products);
