@@ -5,7 +5,7 @@ const authMiddleware = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
+      return res.status(401).json({ message: 'No token, authorization denied' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -13,20 +13,20 @@ const authMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ message: 'Invalid token.' });
+      return res.status(401).json({ message: 'Invalid token' });
     }
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired.' });
+      return res.status(401).json({ message: 'Token expired' });
     }
     console.error('Auth middleware error:', error);
-    res.status(401).json({ message: 'Token verification failed.' });
+    res.status(401).json({ message: 'Token verification failed' });
   }
 };
 
-// Admin middleware pentru operațiuni administrative
+// Admin middleware for administrative operations
 const adminMiddleware = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Access denied. Admin rights required.' });
+    return res.status(403).json({ message: 'Access denied. Admin rights required' });
   }
   next();
 };

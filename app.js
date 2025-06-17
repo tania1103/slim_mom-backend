@@ -60,11 +60,8 @@ const corsOptions = {
       'http://localhost:3001',
       'http://127.0.0.1:3000',
       'https://tania1103.github.io',
-      'https://*.github.io', // Allow all GitHub Pages
       'https://slimmom-frontend.netlify.app',
-      'https://slimmom-frontend.vercel.app',
-      // Add more specific GitHub Pages URLs if needed
-      /^https:\/\/.*\.github\.io$/
+      'https://slimmom-frontend.vercel.app'
     ];
     
     // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -72,12 +69,7 @@ const corsOptions = {
     
     // Check if origin matches any allowed pattern
     const isAllowed = allowedOrigins.some(allowedOrigin => {
-      if (typeof allowedOrigin === 'string') {
-        return allowedOrigin === origin;
-      } else if (allowedOrigin instanceof RegExp) {
-        return allowedOrigin.test(origin);
-      }
-      return false;
+      return allowedOrigin === origin || origin.endsWith('github.io');
     });
     
     if (isAllowed) {
@@ -85,7 +77,7 @@ const corsOptions = {
     } else {
       console.warn(`❌ CORS blocked origin: ${origin}`);
       console.log(`📝 Allowed origins:`, allowedOrigins);
-      return callback(null, true); // Temporarily allow all for debugging
+      return callback(new Error('CORS not allowed'), false);
     }
   },
   credentials: true,

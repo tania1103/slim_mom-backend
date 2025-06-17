@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // ❌ Era "bcryp" în fișier
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {

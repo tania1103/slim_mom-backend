@@ -1,5 +1,13 @@
 const express = require('express');
-const { searchProducts, getProductsByBloodType, getAllProducts, getProductById } = require('../controllers/productsController');
+const { 
+  searchProducts, 
+  getProductsByBloodType, 
+  getAllProducts, 
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  createProduct 
+} = require('../controllers/productsController');
 const { authMiddleware } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -40,6 +48,19 @@ router.get('/blood-type/:bloodType/public', getProductsByBloodType);
 router.get('/blood-type/:bloodType', authMiddleware, getProductsByBloodType);
 
 // Route for getting all products
+router.get('/', authMiddleware, getAllProducts);
+
+// Route for getting a product by ID
+router.get('/:id', authMiddleware, getProductById);
+
+// Route for creating a new product (admin only)
+router.post('/', authMiddleware, createProduct);
+
+// Route for updating a product (admin only) 
+router.put('/:id', authMiddleware, updateProduct);
+
+// Route for deleting a product (admin only)
+router.delete('/:id', authMiddleware, deleteProduct);
 router.get('/', authMiddleware, getAllProducts);
 
 // Route for getting product by ID

@@ -1,7 +1,7 @@
 const DiaryEntry = require('../models/DiaryEntry');
 const Product = require('../models/Product');
 
-// Adaugă un produs consumat într-o anumită zi
+// Add a product to the diary for a specific date
 exports.addProductToDiary = async (req, res) => {
   try {
     const { date, productId, weight, calories } = req.body;
@@ -11,50 +11,69 @@ exports.addProductToDiary = async (req, res) => {
     }
     entry.products.push({ product: productId, weight, calories });
     await entry.save();
-    res.json(entry);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to add product', error: err.message });
+    res.status(201).json({
+      message: 'Product added to diary successfully',
+      entry
+    });
+  } catch (error) {
+    console.error('Add product to diary error:', error);
+    res.status(500).json({ message: 'Failed to add product', error: error.message });
   }
 };
 
-// Șterge un produs consumat într-o anumită zi
+// Remove a product from the diary for a specific date
 exports.removeProductFromDiary = async (req, res) => {
   try {
     const { date, productId } = req.body;
     const entry = await DiaryEntry.findOne({ user: req.user.userId, date });
-    if (!entry) return res.status(404).json({ message: 'Diary entry not found' });
+    
+    if (!entry) {
+      return res.status(404).json({ message: 'Diary entry not found' });
+    }
+    
     entry.products = entry.products.filter(p => p.product.toString() !== productId);
     await entry.save();
-    res.json(entry);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to remove product', error: err.message });
+    
+    res.status(200).json({
+      message: 'Product removed from diary successfully',
+      entry
+    });
+  } catch (error) {
+    console.error('Remove product from diary error:', error);
+    res.status(500).json({ message: 'Failed to remove product', error: error.message });
   }
 };
 
-// Primește toate informațiile despre o anumită zi
+// Get all diary entries for a specific date
 exports.getDiaryByDate = async (req, res) => {
   try {
     const { date } = req.params;
     const entry = await DiaryEntry.findOne({ user: req.user.userId, date }).populate('products.product');
-    res.json(entry || { products: [] });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to get diary', error: err.message });
+    
+    res.status(200).json(entry || { 
+      date,
+      user: req.user.userId,
+      products: [] 
+    });
+  } catch (error) {
+    console.error('Get diary by date error:', error);
+    res.status(500).json({ message: 'Failed to get diary', error: error.message });
   }
 };
 
-// Adaugă un produs în jurnal
+// Add a product to the diary with calculated calories
 exports.addToDiary = async (req, res) => {
   try {
     const { productId, date, grams } = req.body;
     const userId = req.user.userId;
 
-    // Găsește produsul pentru a obține caloriile per 100g
+    // Find the product to get calories per 100g
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Calculează caloriile pentru cantitatea dată
+    // Calculate calories for the given amount
     const calories = (product.calories * grams) / 100;
 
     const diaryEntry = new DiaryEntry({
@@ -78,8 +97,8 @@ exports.addToDiary = async (req, res) => {
   }
 };
 
-// Obține toate înregistrările din jurnal pentru o dată specifică
-exports.getDiaryByDate = async (req, res) => {
+// Get all diary entries for a specific date with total calories
+exports.getDiaryEntries = async (req, res) => {
   try {
     const { date } = req.params;
     const userId = req.user.userId;
